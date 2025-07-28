@@ -1,10 +1,10 @@
 name: strava_flutter
-description:  Fluytter/Dart code to access Strava v3 API including new authentication process (with expired date and refresh token)
+description: Fluytter/Dart code to access Strava v3 API including new authentication process (with expired date and refresh token)
 version: 2.0.0
 homepage: https://github.com/BirdyF/strava_flutter
 
 environment:
-  sdk: '>=2.12.0 <3.0.0'
+  sdk: ">=2.12.0 <3.0.0"
 
 dependencies:
   flutter:
@@ -13,9 +13,10 @@ dependencies:
   http: ^0.13.3
   url_launcher: ^6.0.7
   shared_preferences: ^2.0.6
-  uni_links: ^0.5.1
-  intl: ^0.17.0
+  app_links: ^6.4.0
   json_annotation: ^4.0.1
+  intl: ^0.20.2
+
   # The following adds the Cupertino Icons font to your application.
   # Use with the CupertinoIcons class for iOS style icons.
   cupertino_icons: ^1.0.3

@@ -14,14 +14,20 @@ import 'package:strava_flutter/models/fault/fault.dart';
 import 'package:strava_flutter/models/refresh_answer/refresh_answer.dart';
 import 'package:strava_flutter/models/token/token.dart';
 // To handle browser return after auth is done
-import 'package:uni_links/uni_links.dart';
 import 'package:url_launcher/url_launcher.dart';
+import 'package:app_links/app_links.dart';
 
 ///===========================================
 /// Class related to Authorization processs
 ///===========================================
 abstract class Auth {
   StreamController<String?> onCodeReceived = StreamController();
+
+  /// Close the web view (placeholder function)
+  void closeWebView() {
+    // This is a placeholder - in a real implementation you might close a web view
+    globals.displayInfo('Web view closed');
+  }
 
   /// Save the token and the expiry date
   Future<void> _saveToken(
@@ -39,7 +45,8 @@ abstract class Auth {
     // prefs.setInt('strava_expiresIn',
     //     expiresIn); // Value is valid at the time the token has been issued
     if (scope != null) prefs.setString('strava_scope', scope);
-    if (refreshToken != null) prefs.setString('strava_refreshToken', refreshToken);
+    if (refreshToken != null)
+      prefs.setString('strava_refreshToken', refreshToken);
 
     // Save also in globals to get direct access
     globals.token.accessToken = token;
@@ -85,7 +92,8 @@ abstract class Auth {
     }
 
     if (localToken.expiresAt != null) {
-      final dateExpired = DateTime.fromMillisecondsSinceEpoch(localToken.expiresAt!);
+      final dateExpired =
+          DateTime.fromMillisecondsSinceEpoch(localToken.expiresAt!);
       final _disp =
           '${dateExpired.day.toString()}/${dateExpired.month.toString()} ${dateExpired.hour.toString()} hours';
       globals.displayInfo(
@@ -133,17 +141,20 @@ abstract class Auth {
       globals.displayInfo('Running in web ');
 
       // listening on http the answer from Strava
-      final server = await HttpServer.bind(InternetAddress.anyIPv4, 8080, shared: true);
+      final server =
+          await HttpServer.bind(InternetAddress.anyIPv4, 8080, shared: true);
       await for (final HttpRequest request in server) {
         // Get the answer from Strava
         // final uri = request.uri;
-        globals.displayInfo('Get the answer from Strava to authenticate! ${request.uri}');
+        globals.displayInfo(
+            'Get the answer from Strava to authenticate! ${request.uri}');
       }
     } else {
       globals.displayInfo('Running on iOS or Android');
 
-      // Attach a listener to the stream
-      _sub = uriLinkStream.listen((Uri? uri) {
+      // Attach a listener to the stream using app_links
+      final appLinks = AppLinks();
+      _sub = appLinks.uriLinkStream.listen((Uri? uri) {
         // Parse the link and warn the user, if it is not correct
         globals.displayInfo('Get a link!! $uri');
         if (uri?.scheme.compareTo('stravaflutter_$clientID') != 0) {
@@ -314,8 +325,8 @@ abstract class Auth {
 
     globals.displayInfo('body ${resp.body}');
     if (resp.statusCode == 200) {
-      returnToken =
-          RefreshAnswer.fromJson(json.decode(resp.body) as Map<String, dynamic>);
+      returnToken = RefreshAnswer.fromJson(
+          json.decode(resp.body) as Map<String, dynamic>);
 
       globals.displayInfo('new exp. date: ${returnToken.expiresAt}');
     } else {
